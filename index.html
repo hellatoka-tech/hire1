@@ -157,23 +157,7 @@
             scroll-behavior: smooth;
         }
 
-        /* Loading Screen */
-        .loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--gradient-primary);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        .loading-screen.hidden { opacity: 0; visibility: hidden; }
-        .loading-spinner {
-            width: 50px; height: 50px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top: 3px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
 
         /* Progress Bar */
         .progress-bar-top {
@@ -383,7 +367,7 @@
 
         /* WhatsApp float – RIGHT */
         .wa-float {
-            position: fixed; bottom: 2rem; right: 2rem; z-index: 1000;
+            position: fixed; bottom: 2rem; left: 2rem; z-index: 1000;
             background: #25D366; width: 58px; height: 58px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 4px 20px rgba(37,211,102,0.45); text-decoration: none;
@@ -397,20 +381,20 @@
             50% { transform: translateY(-6px); }
         }
 
-        /* Tawk.to – force LEFT side */
+        /* Tawk.to – RIGHT side (default) */
         #tawk-bubble-container,
         .tawk-min-container,
         .tawk-button-container,
         [id^="tawk-"],
         iframe[src*="tawk"],
         iframe[title*="chat widget"] {
-            left: 1.5rem !important;
-            right: auto !important;
+            right: 1.5rem !important;
+            left: auto !important;
         }
 
         /* Security badge */
         .security-badge {
-            position: fixed; bottom: 2rem; left: 2rem;
+            position: fixed; bottom: 5rem; right: 2rem;
             background: var(--bg-primary); border: 1px solid var(--border-color);
             border-radius: 0.5rem; padding: 0.4rem 0.85rem;
             font-size: 0.75rem; color: var(--text-secondary);
@@ -471,7 +455,7 @@ s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
 // Force Tawk.to widget to LEFT side
-function forceTawkLeft(){
+function forceTawkRight(){
     try {
         var sel = [
             '#tawk-bubble-container',
@@ -482,36 +466,33 @@ function forceTawkLeft(){
         ];
         sel.forEach(function(s){
             document.querySelectorAll(s).forEach(function(el){
-                el.style.setProperty('left','1.5rem','important');
-                el.style.setProperty('right','auto','important');
+                el.style.setProperty('right','1.5rem','important');
+                el.style.setProperty('left','auto','important');
             });
         });
     } catch(e){}
 }
 // Run on load via Tawk API
 if(typeof Tawk_API!=='undefined'){
-    Tawk_API.onLoad = function(){ forceTawkLeft(); };
+    Tawk_API.onLoad = function(){ forceTawkRight(); };
 }
-// Also watch DOM for Tawk injection (most reliable method)
-var tawkObserver = new MutationObserver(function(mutations){
-    mutations.forEach(function(m){
-        if(m.addedNodes.length) forceTawkLeft();
+// Watch DOM for Tawk injection — runs after body is ready
+document.addEventListener('DOMContentLoaded', function(){
+    var tawkObserver = new MutationObserver(function(mutations){
+        mutations.forEach(function(m){
+            if(m.addedNodes.length) forceTawkRight();
+        });
     });
+    if(document.body) tawkObserver.observe(document.body, { childList: true, subtree: true });
 });
-tawkObserver.observe(document.body, { childList: true, subtree: true });
-// Belt-and-braces: run after short delays too
-setTimeout(forceTawkLeft, 1500);
-setTimeout(forceTawkLeft, 3000);
-setTimeout(forceTawkLeft, 6000);
+setTimeout(forceTawkRight, 1500);
+setTimeout(forceTawkRight, 3000);
+setTimeout(forceTawkRight, 6000);
 </script>
 <!--End of Tawk.to Script-->
 
 <body>
 
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-spinner"></div>
-    </div>
 
     <!-- Progress Bar -->
     <div class="progress-bar-top" id="progressBar"></div>
@@ -1081,10 +1062,7 @@ setTimeout(forceTawkLeft, 6000);
     <script>
         lucide.createIcons();
 
-        // Loading screen
-        window.addEventListener('load', function() {
-            setTimeout(() => document.getElementById('loadingScreen').classList.add('hidden'), 800);
-        });
+
 
         // Progress bar
         window.addEventListener('scroll', function() {
