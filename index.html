@@ -397,11 +397,13 @@
             50% { transform: translateY(-6px); }
         }
 
-        /* Tawk.to – force LEFT */
+        /* Tawk.to – force LEFT side */
         #tawk-bubble-container,
         .tawk-min-container,
-        iframe[title*="chat"],
-        iframe[src*="tawk"] {
+        .tawk-button-container,
+        [id^="tawk-"],
+        iframe[src*="tawk"],
+        iframe[title*="chat widget"] {
             left: 1.5rem !important;
             right: auto !important;
         }
@@ -468,16 +470,39 @@ s1.charset='UTF-8';
 s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
-// Force Tawk widget to left side after load
-if(typeof Tawk_API!=='undefined'){
-    Tawk_API.onLoad=function(){
-        try{
-            document.querySelectorAll('iframe[src*="tawk"],#tawk-bubble-container,.tawk-min-container').forEach(function(el){
-                el.style.left='1.5rem'; el.style.right='auto';
+// Force Tawk.to widget to LEFT side
+function forceTawkLeft(){
+    try {
+        var sel = [
+            '#tawk-bubble-container',
+            '.tawk-min-container',
+            '.tawk-button-container',
+            '[id^="tawk-"]',
+            'iframe[src*="tawk"]'
+        ];
+        sel.forEach(function(s){
+            document.querySelectorAll(s).forEach(function(el){
+                el.style.setProperty('left','1.5rem','important');
+                el.style.setProperty('right','auto','important');
             });
-        }catch(e){}
-    };
+        });
+    } catch(e){}
 }
+// Run on load via Tawk API
+if(typeof Tawk_API!=='undefined'){
+    Tawk_API.onLoad = function(){ forceTawkLeft(); };
+}
+// Also watch DOM for Tawk injection (most reliable method)
+var tawkObserver = new MutationObserver(function(mutations){
+    mutations.forEach(function(m){
+        if(m.addedNodes.length) forceTawkLeft();
+    });
+});
+tawkObserver.observe(document.body, { childList: true, subtree: true });
+// Belt-and-braces: run after short delays too
+setTimeout(forceTawkLeft, 1500);
+setTimeout(forceTawkLeft, 3000);
+setTimeout(forceTawkLeft, 6000);
 </script>
 <!--End of Tawk.to Script-->
 
@@ -996,7 +1021,7 @@ if(typeof Tawk_API!=='undefined'){
                         <div class="col-md-5">
                             <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(200,169,110,0.3); border-radius:1rem; padding:1.5rem;">
                                 <h5 style="color:var(--accent-color);">✉️ Secure Email</h5>
-                                <p class="h5 mb-1" style="color:white;">24forhire@protonmail.com</p>
+                                <p class="h5 mb-1" style="color:white;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2e1c1a48415c46475c4b6e5e5c415a4140434f4742004d4143">[email&#160;protected]</a></p>
                                 <small style="color:rgba(255,255,255,0.65);">Response within 24 hours</small>
                             </div>
                         </div>
@@ -1025,7 +1050,7 @@ if(typeof Tawk_API!=='undefined'){
                 <div class="footer-section">
                     <h5>Contact</h5>
                     <p>WhatsApp: <a href="https://wa.me/17373815959">+1 (737) 381-5959</a></p>
-                    <p>Email: <a href="mailto:24forhire@protonmail.com">24forhire@protonmail.com</a></p>
+                    <p>Email: <a href="/cdn-cgi/l/email-protection#c3f1f7a5acb1abaab1a683b3b1acb7acadaea2aaafeda0acae"><span class="__cf_email__" data-cfemail="586a6c3e372a30312a3d18282a372c373635393134763b3735">[email&#160;protected]</span></a></p>
                     <p>Available 24/7 Worldwide</p>
                 </div>
                 <div class="footer-section">
@@ -1051,7 +1076,7 @@ if(typeof Tawk_API!=='undefined'){
     </div>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         lucide.createIcons();
@@ -1134,15 +1159,4 @@ if(typeof Tawk_API!=='undefined'){
                 const r = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(this) });
                 const d = await r.json();
                 if (d.success) { ok.style.display = 'block'; this.reset(); btn.textContent = 'Sent ✓'; }
-                else { throw new Error(d.message); }
-            } catch(ex) {
-                err.style.display = 'block';
-                btn.disabled = false; btn.textContent = 'Send Secure Message →';
-            }
-        });
-
-        // Re-init lucide after DOM changes
-        document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
-    </script>
-</body>
-</html>
+           
